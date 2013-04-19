@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Copyright (c) 2013 Numerate, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+BASE_DIR=$(cd $(dirname $0); pwd)
+
+. ${BASE_DIR}/bitmill.conf
+
+if [ "x${BITMILL_USER}" == "x" ]; then
+	echo BITMILL_USER is not defined in bitmill.conf!
+	exit 1
+fi
+
+if [ "x${BITMILL_KEY}" == "x" ]; then
+	echo BITMILL_KEY is not defined in bitmill.conf!
+	exit 1
+fi
+
+if [ "x${BITMILL_POOL}" == "x" ]; then
+	echo BITMILL_POOL is not defined in bitmill.conf!
+	exit 1
+fi
+
+BITMILL_SERVER=${BITMILL_SERVER:-api.numerate.com}
+BITMILL_API_VERSION=v0
+if [ ".${BITMILL_CURL_OPTS}" == "." ] ; then
+    if [ ".${BITMILL_SERVER}" == ".api.numerate.com" ]; then
+        BITMILL_CURL_OPTS="--cacert ${BASE_DIR}/ComodoSSL.ca-bundle"
+    else
+        BITMILL_CURL_OPTS=-k
+    fi
+fi
+
+function log() {
+	echo "${log_prefix:-UNKNOWN}: $@";
+}
+
+function logerr() {
+	log "$@" 1>&2; 
+}
+
+function bitmill_curl () {
+    curl -u $BITMILL_USER:$BITMILL_KEY -3 -H "Content-Type:application/json" ${BITMILL_CURL_OPTS} "$@"
+}
+
+function attempt_cancel () {
+	echo '{ "status" : "cancelled" }' | bitmill_curl -s -X POST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$1 &> /dev/null
+}
+
+function postJobAndWait () {
+    tmp_response=$(mktemp)
+    bitmill_curl -s -XPOST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs &> $tmp_response
+    id=$(cat $tmp_response | grep \"id\" | cut -f4 -d\")
+
+    if [[ $id =~ [0-9a-f-]{36} ]]; then
+		trap "rm ${tmp_response}; attempt_cancel ${id}; trap - EXIT; exit" EXIT INT TERM
+        log "Submitted $(basename $0) job with id: $id at $(date)"
+        while (bitmill_curl -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$id | grep -e \"running\" -e \"pending\" >/dev/null) ; do sleep 5; done
+        bitmill_curl -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$id | grep \"finished\" > /dev/null
+        exit_code=$?
+        rm $tmp_response
+        trap - EXIT INT TERM
+        if [ $exit_code -ne 0 ] ; then
+        	logerr "Job failed!" 
+    	fi
+        exit ${exit_code}
+    else
+        logerr "Failed to submit $(basename $0) job at $(date)!"
+        logerr "Caused by: $(cat $tmp_response)"
+        rm $tmp_response
+        exit 1
+    fi
+}
+
+function s3_to_url () {
+	echo $1 | sed -e 's/^s3:\/\/\([^\/]*\)\//https:\/\/\1.s3.amazonaws.com\//'
+} 
