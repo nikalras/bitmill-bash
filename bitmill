@@ -67,15 +67,30 @@ function postJobAndWait () {
     if [[ $id =~ [0-9a-f-]{36} ]]; then
 		trap "rm ${tmp_response}; attempt_cancel ${id}; trap - EXIT; exit" EXIT INT TERM
         log "Submitted $(basename $0) job with id: $id at $(date)"
-        while (bitmill_curl -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$id | grep -e \"running\" -e \"pending\" >/dev/null) ; do sleep 5; done
-        bitmill_curl -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$id | grep \"finished\" > /dev/null
-        exit_code=$?
+        while ! (job_status $id | grep -e \"finished\" -e \"failed\" -e \"cancelled\" >/dev/null) ; do sleep 5; done
+        exit_status=$(job_status $id | grep \"status\" | cut -f4 -d\")
         rm $tmp_response
         trap - EXIT INT TERM
-        if [ $exit_code -ne 0 ] ; then
-        	logerr "Job failed!" 
-    	fi
-        exit ${exit_code}
+        case $exit_status in
+            finished)
+                exit 0
+            ;;
+            failed)
+                logerr "Job failed!"
+                exit 1
+            ;;
+            cancelled)
+                logerr "Job was cancelled!"
+                exit 1
+            ;;
+            *)
+                logerr "Unexpected exit status: $exit_status"
+                exit 1
+            ;;
+        esac
+        
+        # should never get here!
+        exit 1
     else
         logerr "Failed to submit $(basename $0) job at $(date)!"
         logerr "Caused by: $(cat $tmp_response)"
@@ -87,3 +102,11 @@ function postJobAndWait () {
 function s3_to_url () {
 	echo $1 | sed -e 's/^s3:\/\/\([^\/]*\)\//https:\/\/\1.s3.amazonaws.com\//'
 } 
+
+function job_status () {
+	bitmill_curl -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$1
+}
+
+function job_status_or_fail() {
+    bitmill_curl -f -s -XGET https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$1
+}
