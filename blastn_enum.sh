@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Fri Apr 19 16:17:37 PDT 2013
+# This script was auto-generated on Thu May 16 16:16:02 PDT 2013
 # using the command:
 # ./gen_script.sh blastn_enum
 
@@ -42,10 +42,21 @@ cat <<EOF
 EOF
 }
 
+if [  "x$1" == "x-w" -o "y$1" == "y--wait" ] ; then
+    WAIT="wait"
+    shift
+else
+    WAIT="async"
+fi
+
 if [ $# -ne 4 ] ; then
 	echo "Usage: $0 <db> <evalue> <query> <tab>"
 	exit 1
 fi
 
 . $(dirname $0)/bitmill
-gen_json $1 $2 $(s3_to_url $3) $(s3_to_url $4) | postJobAndWait
+if [ "x${WAIT}" == "xwait" ] ; then 
+     gen_json $1 $2 $(s3_to_url $3) $(s3_to_url $4)  | postJobAndWait
+else
+     gen_json $1 $2 $(s3_to_url $3) $(s3_to_url $4)  | postJob 
+fi

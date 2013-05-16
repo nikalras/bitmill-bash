@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Fri Apr 19 16:17:39 PDT 2013
+# This script was auto-generated on Thu May 16 16:17:29 PDT 2013
 # using the command:
 # ./gen_script.sh hmm_search
 
@@ -38,10 +38,21 @@ cat <<EOF
 EOF
 }
 
+if [  "x$1" == "x-w" -o "y$1" == "y--wait" ] ; then
+    WAIT="wait"
+    shift
+else
+    WAIT="async"
+fi
+
 if [ $# -ne 3 ] ; then
 	echo "Usage: $0 <fa> <hmm> <result>"
 	exit 1
 fi
 
 . $(dirname $0)/bitmill
-gen_json $(s3_to_url $1) $(s3_to_url $2) $(s3_to_url $3) | postJobAndWait
+if [ "x${WAIT}" == "xwait" ] ; then 
+     gen_json $(s3_to_url $1) $(s3_to_url $2) $(s3_to_url $3)  | postJobAndWait
+else
+     gen_json $(s3_to_url $1) $(s3_to_url $2) $(s3_to_url $3)  | postJob 
+fi

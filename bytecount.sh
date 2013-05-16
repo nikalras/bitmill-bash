@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Fri Apr 19 16:17:38 PDT 2013
+# This script was auto-generated on Thu May 16 16:17:06 PDT 2013
 # using the command:
 # ./gen_script.sh bytecount
 
@@ -35,10 +35,21 @@ cat <<EOF
 EOF
 }
 
+if [  "x$1" == "x-w" -o "y$1" == "y--wait" ] ; then
+    WAIT="wait"
+    shift
+else
+    WAIT="async"
+fi
+
 if [ $# -ne 2 ] ; then
 	echo "Usage: $0 <input> <num_bytes>"
 	exit 1
 fi
 
 . $(dirname $0)/bitmill
-gen_json $(s3_to_url $1) $(s3_to_url $2) | postJobAndWait
+if [ "x${WAIT}" == "xwait" ] ; then 
+     gen_json $(s3_to_url $1) $(s3_to_url $2)  | postJobAndWait
+else
+     gen_json $(s3_to_url $1) $(s3_to_url $2)  | postJob 
+fi

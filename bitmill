@@ -59,6 +59,20 @@ function attempt_cancel () {
 	echo '{ "status" : "cancelled" }' | bitmill_curl -s -X POST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs/$1 &> /dev/null
 }
 
+function postJob() {
+    tmp_response=$(mktemp)
+    bitmill_curl -s -XPOST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs &> $tmp_response
+    id=$(cat $tmp_response | grep \"id\" | cut -f4 -d\")
+    if [[ $id =~ [0-9a-f-]{36} ]]; then
+        log "Submitted $(basename $0) job with id: $id at $(date)"
+    else
+        logerr "Failed to submit $(basename $0) job at $(date)!"
+        logerr "Caused by: $(cat $tmp_response)"
+        rm $tmp_response
+        exit 1
+    fi
+}
+
 function postJobAndWait () {
     tmp_response=$(mktemp)
     bitmill_curl -s -XPOST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs &> $tmp_response

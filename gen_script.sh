@@ -63,6 +63,13 @@ cat <<OUTER_EOF
 EOF
 }
 
+if [  "x\$1" == "x-w" -o "y\$1" == "y--wait" ] ; then
+    WAIT="wait"
+    shift
+else
+    WAIT="async"
+fi
+
 if [ \$# -ne $(echo "$param_names" | wc -l) ] ; then
 	echo "Usage: \$0 <$(echo $param_names | sed -e 's/\s\s*/> </g')>"
 	exit 1
@@ -71,17 +78,23 @@ fi
 . \$(dirname \$0)/bitmill
 OUTER_EOF
 
-#//generate last line
+function generate_gen_json
+{
+    echo -n "gen_json "
+    
+    num=1
+    for name in ${param_names} ; do
+    	if echo "$job_type_template" | grep -A1 -e "\"name\" : \"$name\"" | grep url >/dev/null; then
+    		echo -n "\$(s3_to_url \$${num}) "
+    	else
+    		echo -n "\$${num} "
+    	fi
+    	num=$((num+1))
+    done
+}
 
-echo -n "gen_json "
-
-num=1
-for name in ${param_names} ; do
-	if echo "$job_type_template" | grep -A1 -e "\"name\" : \"$name\"" | grep url >/dev/null; then
-		echo -n "\$(s3_to_url \$${num}) "
-	else
-		echo -n "\$${num} "
-	fi
-	num=$((num+1))
-done
-echo "| postJobAndWait"
+echo 'if [ "x${WAIT}" == "xwait" ] ; then '
+echo "    " $(generate_gen_json) " | postJobAndWait"
+echo 'else'
+echo "    " $(generate_gen_json) " | postJob "
+echo 'fi'
