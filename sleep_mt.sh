@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:26:48 PDT 2013
+# This script was auto-generated on Thu May 16 20:47:17 PDT 2013
 # using the command:
 # ./gen_script.sh sleep_mt
 
@@ -47,7 +47,7 @@ else
 fi
 
 if [ $# -ne 3 ] ; then
-	echo "Usage: $0 <time_millis> <dummy_input> <dummy_output>"
+	echo "Usage: $0 [-w|--wait] <time_millis> <dummy_input> <dummy_output>"
 	exit 1
 fi
 

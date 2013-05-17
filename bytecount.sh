@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:17:06 PDT 2013
+# This script was auto-generated on Thu May 16 20:46:37 PDT 2013
 # using the command:
 # ./gen_script.sh bytecount
 
@@ -43,7 +43,7 @@ else
 fi
 
 if [ $# -ne 2 ] ; then
-	echo "Usage: $0 <input> <num_bytes>"
+	echo "Usage: $0 [-w|--wait] <input> <num_bytes>"
 	exit 1
 fi
 

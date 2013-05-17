@@ -71,7 +71,7 @@ else
 fi
 
 if [ \$# -ne $(echo "$param_names" | wc -l) ] ; then
-	echo "Usage: \$0 <$(echo $param_names | sed -e 's/\s\s*/> </g')>"
+	echo "Usage: \$0 [-w|--wait] <$(echo $param_names | sed -e 's/\s\s*/> </g')>"
 	exit 1
 fi
 

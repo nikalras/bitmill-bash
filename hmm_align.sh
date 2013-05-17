@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:17:20 PDT 2013
+# This script was auto-generated on Thu May 16 20:46:52 PDT 2013
 # using the command:
 # ./gen_script.sh hmm_align
 
@@ -46,7 +46,7 @@ else
 fi
 
 if [ $# -ne 3 ] ; then
-	echo "Usage: $0 <fa> <hmm> <result>"
+	echo "Usage: $0 [-w|--wait] <fa> <hmm> <result>"
 	exit 1
 fi
 

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:16:10 PDT 2013
+# This script was auto-generated on Thu May 16 20:45:59 PDT 2013
 # using the command:
 # ./gen_script.sh blastn
 
@@ -56,7 +56,7 @@ else
 fi
 
 if [ $# -ne 6 ] ; then
-	echo "Usage: $0 <evalue> <query> <nin> <nhr> <nsq> <tab>"
+	echo "Usage: $0 [-w|--wait] <evalue> <query> <nin> <nhr> <nsq> <tab>"
 	exit 1
 fi
 

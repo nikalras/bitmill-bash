@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:16:02 PDT 2013
+# This script was auto-generated on Thu May 16 20:45:52 PDT 2013
 # using the command:
 # ./gen_script.sh blastn_enum
 
@@ -50,7 +50,7 @@ else
 fi
 
 if [ $# -ne 4 ] ; then
-	echo "Usage: $0 <db> <evalue> <query> <tab>"
+	echo "Usage: $0 [-w|--wait] <db> <evalue> <query> <tab>"
 	exit 1
 fi
 

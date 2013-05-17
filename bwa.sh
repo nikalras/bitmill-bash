@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 16:16:22 PDT 2013
+# This script was auto-generated on Thu May 16 20:46:08 PDT 2013
 # using the command:
 # ./gen_script.sh bwa
 
@@ -47,7 +47,7 @@ else
 fi
 
 if [ $# -ne 3 ] ; then
-	echo "Usage: $0 <db> <fastq> <sam>"
+	echo "Usage: $0 [-w|--wait] <db> <fastq> <sam>"
 	exit 1
 fi
 
