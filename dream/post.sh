@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2013 Numerate, Inc
 #
@@ -14,13 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-. $(dirname $0)/../bitmill
+base_dir=$(cd $(dirname $0)/..; pwd)
+source ${base_dir}/bitmill
 
-function gen_json
-{
-cat <<EOF
-$1
-EOF
-}
-
-gen_json $1 | postJob
+echo "$1" | postJob

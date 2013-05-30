@@ -54,9 +54,9 @@ fi
 log "$0 $@ PID=$$"
 
 #Grant ACLs to bitmill server's amazon account
-s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
-s3cmd setacl --acl-grant=read_acp:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
-s3cmd setacl --acl-grant=write:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
+#s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
+#s3cmd setacl --acl-grant=read_acp:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
+#s3cmd setacl --acl-grant=write:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
 
 #Grant bucket permissions to BitMill account
 tmp_cred=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
@@ -78,7 +78,7 @@ if ! s3cmd info ${s3_param_file} &>/dev/null ; then
 fi
 s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} ${s3_param_file} >/dev/null
 
-echo $base_dir/dream_sim.sh \
+$base_dir/dream_sim.sh \
     $numsims  \
     ${s3_param_file} \
     s3://${bucket}/${prefix}.mat \

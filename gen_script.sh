@@ -30,10 +30,10 @@ if [ $? -ne 0 ] ; then
 	exit 1
 fi
 
-param_names=$(echo "${job_type_template}" | grep name | sed -e 's/.*"name"\s*:\s*"\([^"]*\)".*/\1/')
+param_names=$(echo "${job_type_template}" | grep -F '"name" :' | sed -e 's/.*"name"\s*:\s* "\([^"]*\)".*/\1/')
 
 cat <<OUTER_EOF
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2013 Numerate, Inc
 #
@@ -84,7 +84,7 @@ function generate_gen_json
     
     num=1
     for name in ${param_names} ; do
-    	if echo "$job_type_template" | grep -A1 -e "\"name\" : \"$name\"" | grep url >/dev/null; then
+    	if echo "$job_type_template" | grep -A1 -F "\"name\" : \"$name\"" | grep url >/dev/null; then
     		echo -n "\$(s3_to_url \$${num}) "
     	else
     		echo -n "\$${num} "

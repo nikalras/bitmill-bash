@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2013 Numerate, Inc
 #
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script was auto-generated on Thu May 16 20:47:10 PDT 2013
+# This script was auto-generated on Thu May 30 11:12:43 PDT 2013
 # using the command:
 # ./gen_script.sh mpileup
 
