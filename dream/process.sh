@@ -53,15 +53,6 @@ fi
 
 log "$0 $@ PID=$$"
 
-#Grant ACLs to bitmill server's amazon account
-#s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
-#s3cmd setacl --acl-grant=read_acp:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
-#s3cmd setacl --acl-grant=write:${BITMILL_SERVER_ACCOUNT} s3://${bucket} >/dev/null
-
-#Grant bucket permissions to BitMill account
-tmp_cred=$(mktemp) || { echo "Failed to create temp file"; exit 1; }
-s3cmd put ${tmp_cred} s3://${bucket}/${BITMILL_USER} >/dev/null
-
 param_hash=$(md5sum ${params} -b 2>/dev/null | cut -f1 -d' ')
 if [ "x${param_hash}" == "x" ] ; then
     param_hash=$(stat -c%Z ${params} 2>/dev/null)
@@ -75,11 +66,11 @@ param_file=${prefix}_param_${param_hash}.${param_extension}
 s3_param_file="s3://${bucket}/${param_file}"
 if ! s3cmd info ${s3_param_file} &>/dev/null ; then
     s3cmd put ${params} ${s3_param_file}  &>/dev/null
+    s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} ${s3_param_file} >/dev/null
 fi
-s3cmd setacl --acl-grant=read:${BITMILL_SERVER_ACCOUNT} ${s3_param_file} >/dev/null
 
 $base_dir/dream_sim.sh \
-    $numsims  \
+    ${BITMILL_NOTIFY_EMAIL:-no_email_specified} \
     ${s3_param_file} \
     s3://${bucket}/${prefix}.mat \
     s3://${bucket}/${prefix}.out \

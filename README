@@ -1,4 +1,8 @@
 Bash client scripts for the BitMill API
 
+To generate wrapper scripts, download your configuration file (bitmill.conf) 
+from http://bitmill.numerate.com/ and place it in this directory. Then run 
+ ./gen_all_scripts.sh
+
 For further information see:
 http://bitmill.numerate.com

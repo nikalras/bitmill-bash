@@ -57,7 +57,7 @@ function gen_json
 {
 cat <<EOF
 OUTER_EOF
-echo "$job_type_template" | perl -p -e 'if ($_ =~ /"(value|url)" : ".*"/) {$num++; $_ =~ s/"(value|url)" : ".*"/"\1" : "\$$num"/;}' 
+echo "$job_type_template" | perl -p -e 'if ($_ =~ /"(value|url)" : ".*"/) {$num++; $_ =~ s/"(value|url)" : ".*"/"\1" : "\${$num}"/;}' 
 
 cat <<OUTER_EOF
 EOF
@@ -85,9 +85,9 @@ function generate_gen_json
     num=1
     for name in ${param_names} ; do
     	if echo "$job_type_template" | grep -A1 -F "\"name\" : \"$name\"" | grep url >/dev/null; then
-    		echo -n "\$(s3_to_url \$${num}) "
+    		echo -n "\$(s3_to_url \${${num}}) "
     	else
-    		echo -n "\$${num} "
+    		echo -n "\${${num}} "
     	fi
     	num=$((num+1))
     done
