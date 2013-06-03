@@ -14,9 +14,9 @@ do
 	esac
 done
 
-if [ $# -ne 4 ]; then
+if [ $# -ne 3 ]; then
 cat <<EOF
- Usage: $0 [-l log_prefix] <num_simulations> <params.[mat|xml]> <s3_bucket_name> <s3_output_prefix>
+ Usage: $0 [-l log_prefix] <params.[mat|xml]> <s3_bucket_name> <s3_output_prefix>
  Takes an input parameters file (.mat or .xml) and submits a Dream Challenge job to BitMill for processing.
  Output will be placed in the specified bucket, using the given prefix. Three output files will be generated:
     s3://s3_bucket_name/prefix.mat
@@ -27,10 +27,9 @@ EOF
     exit 1
 fi 
 
-numsims=$1
-params=$2
-bucket=$3
-prefix=$4
+params=$1
+bucket=$2
+prefix=$3
 
 export log_prefix=${log_prefix:-$prefix}
 base_dir=$(cd $(dirname $0)/..; pwd)
