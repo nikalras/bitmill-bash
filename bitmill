@@ -33,7 +33,16 @@ if [ "x${BITMILL_POOL}" == "x" ]; then
 	exit 1
 fi
 
-BITMILL_SERVER=${BITMILL_SERVER:-api.numerate.com}
+if [ "x${BITMILL_SERVER}" == "x" ]; then
+    echo BITMILL_SERVER is not defined in bitmill.conf!
+    exit 1
+fi
+
+if [ "x${BITMILL_SERVER_ACCOUNT}" == "x" ]; then
+    echo BITMILL_SERVER_ACCOUNT is not defined in bitmill.conf!
+    exit 1
+fi
+
 BITMILL_API_VERSION=v0
 if [ ".${BITMILL_CURL_OPTS}" == "." ] ; then
     if [ ".${BITMILL_SERVER}" == ".api.numerate.com" ]; then
