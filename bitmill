@@ -72,7 +72,7 @@ function attempt_cancel () {
 }
 
 function postJob() {
-    tmp_response=$(mktemp)
+    tmp_response=$(mktemp tmp.XXXXXXXXXX)
     bitmill_curl -s -XPOST -d @- https://$BITMILL_SERVER/$BITMILL_API_VERSION/pools/$BITMILL_POOL/jobs &> $tmp_response
     id=$(cat $tmp_response | grep \"id\" | cut -f4 -d\")
     if [[ $id =~ [0-9a-f-]{36} ]]; then
