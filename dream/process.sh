@@ -18,11 +18,12 @@ if [ $# -ne 3 ]; then
 cat <<EOF
  Usage: $0 [-l log_prefix] <params.[mat|xml]> <s3_bucket_name> <s3_output_prefix>
  Takes an input parameters file (.mat or .xml) and submits a Dream Challenge job to BitMill for processing.
- Output will be placed in the specified bucket, using the given prefix. Three output files will be generated:
-    s3://s3_bucket_name/prefix.mat
+ Output will be placed in the specified bucket, using the given prefix. Four output files will be generated:
+    s3://s3_bucket_name/prefix_predictions.mat
+    s3://s3_bucket_name/prefix_distances.mat
     s3://s3_bucket_name/prefix.out
     s3://s3_bucket_name/prefix.err
- containing the job results, stdout and stderr, respectively.
+ containing the simulation predictions, distances, stdout and stderr, respectively.
 EOF
     exit 1
 fi 
@@ -71,14 +72,16 @@ fi
 $base_dir/dream_sim.sh \
     ${BITMILL_NOTIFY_EMAIL:-no_email_specified} \
     ${s3_param_file} \
-    s3://${bucket}/${prefix}.mat \
+    s3://${bucket}/${prefix}_predictions.mat \
+    s3://${bucket}/${prefix}_distances.mat \
     s3://${bucket}/${prefix}.out \
     s3://${bucket}/${prefix}.err
 
 if [ $? -eq 0 ] ; then    
     echo "To check on the status of the job, run ${base_dir}/jobs.sh <job_id>."
     echo "When finished, the output files can be downloaded using the following commands:"
-    echo " s3cmd get s3://${bucket}/${prefix}.mat"
+    echo " s3cmd get s3://${bucket}/${prefix}_predictions.mat"
+    echo " s3cmd get s3://${bucket}/${prefix}_distances.mat"
     echo " s3cmd get s3://${bucket}/${prefix}.out" 
     echo " s3cmd get s3://${bucket}/${prefix}.err"
     echo "To request cancellation of the job, run ${base_dir}/cancel.sh <job_id>."
